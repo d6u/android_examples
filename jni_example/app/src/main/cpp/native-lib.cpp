@@ -1,19 +1,22 @@
 #include <jni.h>
 #include <string>
 
+// Use extern "C" to inhibit name mangling in C++, so C code can get the function name.
+// JNICALL contains compiler directives to compile the code. On Android it's probably empty.
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_jniexample_MainActivity_callNativeTheOldWay(JNIEnv *env, jobject /* this */) {
 }
 
-extern "C" JNIEXPORT void JNICALL
+// Function using RegisterNatives() doesn't need extern "C" because it's registered entirely in C++.
+JNIEXPORT void JNICALL
 CallNativeTheNewWay(JNIEnv *env, jobject /* this */) {
 }
 
-extern "C" JNIEXPORT void JNICALL
+JNIEXPORT void JNICALL
 CallNativeWithStaticMethod(JNIEnv *env, jclass /* this */) {
 }
 
-extern "C" JNIEXPORT jstring JNICALL
+JNIEXPORT jstring JNICALL
 GetStringFromJni(JNIEnv *env, jobject /* this */, jstring name) {
     // Use JNI_TRUE or JNI_FALSE for jboolean
     const char *chars = env->GetStringUTFChars(name, JNI_FALSE);
@@ -28,7 +31,7 @@ GetStringFromJni(JNIEnv *env, jobject /* this */, jstring name) {
 }
 
 // JNIEXPORT is for adding methods to dynamic table of .so file.
-JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *) {
     JNIEnv *env;
 
     if (vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK) {
