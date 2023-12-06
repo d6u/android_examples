@@ -1,6 +1,8 @@
 #include <jni.h>
 #include <string>
 
+#include "Example.h"
+
 static jclass jclassMainActivity;
 static jmethodID jmethodApplyPrefix;
 static jmethodID jmethodApplySuffix;
@@ -19,11 +21,6 @@ CallNativeTheNewWay(JNIEnv *env, jobject /* this */) {
 JNIEXPORT void JNICALL
 CallNativeWithStaticMethod(JNIEnv *env, jclass /* this */) {
 }
-
-class Example {
-public:
-    static void CallNativeStaticMethodWithStaticMethod(JNIEnv *env, jclass) {}
-};
 
 JNIEXPORT jstring JNICALL
 GetStringFromJni(JNIEnv *env, jobject mainActivity /* this */, jstring name) {
