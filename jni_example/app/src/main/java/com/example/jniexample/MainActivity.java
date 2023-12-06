@@ -25,12 +25,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         TextView tv = binding.sampleText;
-        tv.setText(stringFromJNI());
+        tv.setText(getStringFromJni("World"));
     }
 
-    /**
-     * A native method that is implemented by the 'jniexample' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    public native void callNativeTheOldWay();
+
+    // instance native method will pass reference to the instance
+    public native void callNativeTheNewWay();
+
+    // static native method will pass reference to the class
+    public static native void callNativeWithStaticMethod();
+
+    public native String getStringFromJni(String name);
 }
