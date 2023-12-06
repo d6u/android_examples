@@ -2,6 +2,7 @@
 #include <string>
 
 #include "Example.h"
+#include "HybridObject.h"
 
 static jclass jclassMainActivity;
 static jmethodID jmethodApplyPrefix;
@@ -105,6 +106,12 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *) {
             jclassMainActivity,
             "applySuffix",
             "(Ljava/lang/String;)Ljava/lang/String;");
+
+    // Advanced example
+
+    if ((resultCode = HybridObject::JniRegister(env)) != JNI_OK) {
+        return resultCode;
+    }
 
     return JNI_VERSION_1_6;
 }

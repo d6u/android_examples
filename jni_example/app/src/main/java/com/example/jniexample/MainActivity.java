@@ -26,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         TextView tv = binding.sampleText;
         tv.setText(getStringFromJni("World"));
+
+        HybridObject one = new HybridObject();
+        HybridObject two = new HybridObject();
+
+        two.sayId();
+        one.sayId();
     }
 
     // It doesn't matter if Java methods are private or public.
