@@ -1,6 +1,10 @@
 #include <jni.h>
 #include <string>
 
+static jclass jclassMainActivity;
+static jmethodID jmethodApplyPrefix;
+static jmethodID jmethodApplySuffix;
+
 // Use extern "C" to inhibit name mangling in C++, so C code can get the function name.
 // JNICALL contains compiler directives to compile the code. On Android it's probably empty.
 extern "C" JNIEXPORT void JNICALL
@@ -16,18 +20,36 @@ JNIEXPORT void JNICALL
 CallNativeWithStaticMethod(JNIEnv *env, jclass /* this */) {
 }
 
+class Example {
+public:
+    static void CallNativeStaticMethodWithStaticMethod(JNIEnv *env, jclass) {}
+};
+
 JNIEXPORT jstring JNICALL
-GetStringFromJni(JNIEnv *env, jobject /* this */, jstring name) {
+GetStringFromJni(JNIEnv *env, jobject mainActivity /* this */, jstring name) {
     // Use JNI_TRUE or JNI_FALSE for jboolean
     const char *chars = env->GetStringUTFChars(name, JNI_FALSE);
-
-    std::string hello("Hello, ");
-    hello += chars;
-
+    std::string nameStr(chars);
     // Always pair GetStringUTFChars() with a ReleaseStringUTFChars().
     env->ReleaseStringUTFChars(name, chars);
 
-    return env->NewStringUTF(hello.c_str());
+    // Don't need to call any clean function because JVM will clean it when this function call
+    // finish.
+    jstring jstringNewName = env->NewStringUTF(nameStr.c_str());
+
+    auto result = (jstring) env->CallObjectMethod(
+            mainActivity,
+            jmethodApplyPrefix,
+            jstringNewName);
+
+    result = (jstring) env->CallStaticObjectMethod(
+            // We can either use env->GetObjectClass on the instance
+            // or use cached jclassMainActivity above.
+            env->GetObjectClass(mainActivity),
+            jmethodApplySuffix,
+            result);
+
+    return result;
 }
 
 // JNIEXPORT is for adding methods to dynamic table of .so file.
@@ -57,6 +79,11 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *) {
                     reinterpret_cast<void *>(CallNativeWithStaticMethod),
             },
             {
+                    "callNativeStaticMethodWithStaticMethod",
+                    "()V",
+                    reinterpret_cast<void *>(Example::CallNativeStaticMethodWithStaticMethod),
+            },
+            {
                     "getStringFromJni",
                     "(Ljava/lang/String;)Ljava/lang/String;",
                     reinterpret_cast<void *>(GetStringFromJni),
@@ -68,6 +95,19 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *) {
     if (resultCode != JNI_OK) {
         return resultCode;
     }
+
+    // Cached methods, so we can call it later.
+    // Also raise any error early if method cannot be found.
+
+    jclassMainActivity = reinterpret_cast<jclass>(env->NewGlobalRef(cls));
+    jmethodApplyPrefix = env->GetMethodID(
+            jclassMainActivity,
+            "applyPrefix",
+            "(Ljava/lang/String;)Ljava/lang/String;");
+    jmethodApplySuffix = env->GetStaticMethodID(
+            jclassMainActivity,
+            "applySuffix",
+            "(Ljava/lang/String;)Ljava/lang/String;");
 
     return JNI_VERSION_1_6;
 }

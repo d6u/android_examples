@@ -28,13 +28,25 @@ public class MainActivity extends AppCompatActivity {
         tv.setText(getStringFromJni("World"));
     }
 
-    public native void callNativeTheOldWay();
+    // It doesn't matter if Java methods are private or public.
+    private native void callNativeTheOldWay();
 
     // instance native method will pass reference to the instance
-    public native void callNativeTheNewWay();
+    private native void callNativeTheNewWay();
 
     // static native method will pass reference to the class
-    public static native void callNativeWithStaticMethod();
+    private static native void callNativeWithStaticMethod();
 
-    public native String getStringFromJni(String name);
+    // Native side can also register a static method of a class to to handle the call
+    private static native void callNativeStaticMethodWithStaticMethod();
+
+    private native String getStringFromJni(String name);
+
+    private String applyPrefix(String str) {
+        return "Hello, " + str;
+    }
+
+    private static String applySuffix(String str) {
+        return str + "!";
+    }
 }
