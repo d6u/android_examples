@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <string>
+#include <android/log.h>
 
 #include "Example.h"
 #include "HybridObject.h"
@@ -114,4 +115,9 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *) {
     }
 
     return JNI_VERSION_1_6;
+}
+
+// This is never called on Android, so we can ignore this.
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *) {
+    __android_log_print(ANDROID_LOG_DEBUG, "JniExample", "JNI_OnUnload");
 }

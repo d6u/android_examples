@@ -3,6 +3,7 @@ package com.example.jniexample;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.example.jniexample.databinding.ActivityMainBinding;
@@ -32,6 +33,13 @@ public class MainActivity extends AppCompatActivity {
 
         two.sayId();
         one.sayId();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.d("JniExample", "MainActivity.onDestroy");
     }
 
     // It doesn't matter if Java methods are private or public.
